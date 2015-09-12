@@ -1,0 +1,95 @@
+#include <iostream>
+#include <conio.h>
+#include <stdlib.h>
+#include <windows.h>
+#include <time.h>
+
+using namespace std;
+
+int posX=0, posY=0, direction;
+bool game=true;
+long int eLast = GetTickCount();
+long int eNow = GetTickCount();
+long int last = GetTickCount();
+long int now = GetTickCount();
+
+void sleepcp(int milliseconds){
+    clock_t time_end;
+    time_end = clock() + milliseconds * CLOCKS_PER_SEC/1000;
+    while(clock() < time_end){}
+}
+
+void draw(){
+    system("cls");
+
+    switch(direction){
+    case 0:
+        if(posY>0) posY--;
+        break;
+    case 1:
+        if(posY < 24) posY++;
+        break;
+    case 2:
+        if(posX > 0) posX--;
+        break;
+    case 3:
+        if(posX < 79) posX++;
+        break;
+    }
+    for(int i=0; i<posY; i++){
+        cout << "\n";
+    }
+    for(int j=0; j<posX; j++){
+        cout << " ";
+    }
+    cout << "O";
+}
+
+void afterKeypress(){
+        eLast = eNow;
+        eNow = GetTickCount();
+        draw();
+        last = eLast;
+        now = eNow;
+}
+
+void checkKeyDown(){
+    SHORT checkUp = GetAsyncKeyState(0x26);
+    SHORT checkDown = GetAsyncKeyState(0x28);
+    SHORT checkLeft = GetAsyncKeyState(0x25);
+    SHORT checkRight = GetAsyncKeyState(0x27);
+    SHORT checkEsc = GetAsyncKeyState(0x1B);
+    eNow = GetTickCount();
+
+    if(checkUp && direction != 0 && direction != 1 && eLast+100<eNow){
+        direction =0;
+        afterKeypress();
+    }if(checkDown && direction != 1 && direction != 0 && eLast+100<eNow){
+        direction =1;
+        afterKeypress();
+    }if(checkLeft && direction != 3 && direction != 2 && eLast+100<eNow){
+        direction =2;
+        afterKeypress();
+    }if(checkRight && direction != 2 && direction != 3 && eLast+100<eNow){
+        direction =3;
+        afterKeypress();
+    }if(checkEsc){
+        system("cls");
+        cout << "Bye bye!";
+        sleepcp(1000);
+        game = false;
+    }
+}
+
+int main()
+{
+    while( game ){
+        checkKeyDown();
+        now = GetTickCount();
+        if(last + 100 < now){
+            last = now;
+            draw();
+        }
+    }
+    return 0;
+}
